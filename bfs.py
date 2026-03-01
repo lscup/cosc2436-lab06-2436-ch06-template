@@ -16,14 +16,50 @@ def bfs_find_path(graph: Graph, start: str, end: str) -> Optional[List[str]]:
     Returns:
         List of vertices forming the path, or None if no path exists
     """
-    # TODO: Implement bfs_find_path
-    # 1. Check if start or end is not in graph, return None if not
-    # 2. Initialize a queue with (start, [start])
-    # 3. Initialize visited set with start
-    # 4. While queue is not empty, pop the queue
-    # 5. If current vertex is end, return path
-    # 6. For each neighbor of current, if not visited, add to queue and visited
-    pass  # Remove this and add your code
+    if start not in graph.vertices or end not in graph.vertices:
+        print(f"Error: '{start}' or '{end}' not in graph")
+        return None
+    
+    # Queue stores (current_vertex, path_to_current)
+    queue = deque([(start, [start])])
+    
+    # Track visited vertices to avoid cycles
+    visited = {start}
+    
+    print(f"\nBFS from '{start}' to '{end}':")
+    print("-" * 40)
+    
+    level = 0
+    nodes_at_level = 1
+    next_level_nodes = 0
+    
+    while queue:
+        current, path = queue.popleft()
+        nodes_at_level -= 1
+        
+        print(f"Level {level}: Visiting '{current}'")
+        
+        # Found the destination!
+        if current == end:
+            print(f"\nFound path with {len(path) - 1} edges!")
+            return path
+        
+        # Explore neighbors
+        for neighbor in graph.get_neighbors(current):
+            if neighbor not in visited:
+                visited.add(neighbor)
+                new_path = path + [neighbor]
+                queue.append((neighbor, new_path))
+                next_level_nodes += 1
+        
+        # Track levels for visualization
+        if nodes_at_level == 0:
+            level += 1
+            nodes_at_level = next_level_nodes
+            next_level_nodes = 0
+    
+    print(f"\nNo path found from '{start}' to '{end}'")
+    return None
 
 def bfs_all_reachable(graph: Graph, start: str) -> Dict[str, int]:
     """
@@ -32,17 +68,24 @@ def bfs_all_reachable(graph: Graph, start: str) -> Dict[str, int]:
     Returns:
         Dict mapping vertex -> distance from start
     """
-    # TODO: Implement bfs_all_reachable
-    # 1. Check if start is not in graph, return empty dict if not
-    # 2. Initialize distances dict with start at distance 0
-    # 3. Initialize queue with start
-    # 4. While queue is not empty, pop queue
-    # 5. For each neighbor, if not in distances, set distance and add to queue
-    pass  # Remove this and add your code
+    if start not in graph.vertices:
+        return {}
+    
+    distances = {start: 0}
+    queue = deque([start])
+    
+    while queue:
+        current = queue.popleft()
+        current_dist = distances[current]
+        
+        for neighbor in graph.get_neighbors(current):
+            if neighbor not in distances:
+                distances[neighbor] = current_dist + 1
+                queue.append(neighbor)
+    
+    return distances
 
 def bfs_is_connected(graph: Graph, v1: str, v2: str) -> bool:
     """Check if path exists between two vertices."""
-    # TODO: Implement bfs_is_connected
-    # 1. Use bfs_find_path to check if path exists
-    # 2. Return True if path exists, False otherwise
-    pass  # Remove this and add your code
+    path = bfs_find_path(graph, v1, v2)
+    return path is not None
